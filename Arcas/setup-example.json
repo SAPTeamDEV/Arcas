@@ -1,0 +1,340 @@
+{
+  "application": {
+    "name": "Arcas",
+    "version": "1.0.0",
+    "publisher": "SAPTeam",
+    "description": "Advanced setup wizard framework",
+    "website": "https://github.com/SAPTeamDEV/Arcas",
+    "supportUrl": "https://github.com/SAPTeamDEV/Arcas/issues",
+    "iconPath": "icon.ico"
+  },
+  "globalSettings": {
+    "defaultInstallPath": "C:\\Program Files\\Arcas",
+    "allowCustomInstallPath": true,
+    "createUninstaller": true,
+    "requireAdministrator": false,
+    "minimumDiskSpace": 104857600,
+    "supportedArchitectures": ["x86", "x64", "ARM64"],
+    "uninstallerName": "uninstall.exe",
+    "addToControlPanel": true,
+    "createStartMenuEntries": true,
+    "createDesktopShortcut": false
+  },
+  "architectureSettings": {
+    "x64": {
+      "defaultInstallPath": "C:\\Program Files\\Arcas",
+      "minimumDiskSpace": 104857600
+    },
+    "x86": {
+      "defaultInstallPath": "C:\\Program Files (x86)\\Arcas",
+      "minimumDiskSpace": 52428800
+    },
+    "ARM64": {
+      "defaultInstallPath": "C:\\Program Files\\Arcas ARM64",
+      "minimumDiskSpace": 83886080
+    }
+  },
+  "license": {
+    "title": "End User License Agreement",
+    "textFilePath": "license.txt",
+    "required": true,
+    "acceptText": "I accept the terms in the License Agreement",
+    "declineText": "I do not accept the terms in the License Agreement"
+  },
+  "components": [
+    {
+      "id": "core",
+      "name": "Core Application",
+      "description": "Main Arcas application with all essential features. This component is required and cannot be deselected.",
+      "required": true,
+      "defaultSelected": true,
+      "sizeBytes": 26214400,
+      "commands": [
+        {
+          "id": "copy-core-files",
+          "name": "Copy Core Application Files",
+          "type": "CopyDirectory",
+          "timing": "Install",
+          "order": 1,
+          "required": true,
+          "parameters": {
+            "source": "bin\\",
+            "destination": "{InstallPath}\\",
+            "recursive": true
+          }
+        },
+        {
+          "id": "create-config",
+          "name": "Create Configuration File",
+          "type": "RunShellCommand",
+          "timing": "PostInstall",
+          "order": 1,
+          "parameters": {
+            "command": "echo {\"version\":\"{AppVersion}\",\"installPath\":\"{InstallPath}\"} > \"{InstallPath}\\config.json\""
+          }
+        }
+      ]
+    },
+    {
+      "id": "documentation",
+      "name": "Documentation",
+      "description": "Complete user manual, help files, API documentation, and tutorials. Includes HTML help files, PDF manuals, and context-sensitive help integration.",
+      "required": false,
+      "defaultSelected": true,
+      "sizeBytes": 15728640,
+      "commands": [
+        {
+          "id": "copy-docs",
+          "name": "Copy Documentation Files",
+          "type": "CopyDirectory",
+          "parameters": {
+            "source": "docs\\",
+            "destination": "{InstallPath}\\Documentation\\",
+            "recursive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "samples",
+      "name": "Sample Projects",
+      "description": "Example projects and templates to help you get started with Arcas. Includes various configuration examples and demonstration materials.",
+      "required": false,
+      "defaultSelected": false,
+      "sizeBytes": 10485760,
+      "commands": [
+        {
+          "id": "copy-samples",
+          "name": "Copy Sample Projects",
+          "type": "CopyDirectory",
+          "parameters": {
+            "source": "samples\\",
+            "destination": "{InstallPath}\\Samples\\",
+            "recursive": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "desktop-shortcut",
+      "name": "Desktop Shortcut",
+      "description": "Create a convenient shortcut icon on your desktop for quick access to Arcas. The shortcut can be customized or removed later.",
+      "required": false,
+      "defaultSelected": true,
+      "sizeBytes": 0,
+      "commands": [
+        {
+          "id": "create-desktop-shortcut",
+          "name": "Create Desktop Shortcut",
+          "type": "CreateShortcut",
+          "parameters": {
+            "targetPath": "{InstallPath}\\{AppName}.exe",
+            "shortcutPath": "{Desktop}\\{AppName}.lnk",
+            "description": "{AppDescription}",
+            "workingDirectory": "{InstallPath}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "start-menu",
+      "name": "Start Menu Shortcuts",
+      "description": "Create program shortcuts in the Windows Start menu for easy access. Includes main application shortcut, documentation links, and uninstaller.",
+      "required": false,
+      "defaultSelected": true,
+      "sizeBytes": 0,
+      "commands": [
+        {
+          "id": "create-start-menu-folder",
+          "name": "Create Start Menu Folder",
+          "type": "CreateDirectory",
+          "order": 1,
+          "parameters": {
+            "path": "{StartMenu}\\Programs\\{AppPublisher}\\{AppName}"
+          }
+        },
+        {
+          "id": "create-start-menu-shortcut",
+          "name": "Create Start Menu Application Shortcut",
+          "type": "CreateShortcut",
+          "order": 2,
+          "parameters": {
+            "targetPath": "{InstallPath}\\{AppName}.exe",
+            "shortcutPath": "{StartMenu}\\Programs\\{AppPublisher}\\{AppName}\\{AppName}.lnk",
+            "description": "{AppDescription}",
+            "workingDirectory": "{InstallPath}"
+          }
+        },
+        {
+          "id": "create-uninstaller-shortcut",
+          "name": "Create Uninstaller Shortcut",
+          "type": "CreateShortcut",
+          "order": 3,
+          "parameters": {
+            "targetPath": "{InstallPath}\\uninstall.exe",
+            "shortcutPath": "{StartMenu}\\Programs\\{AppPublisher}\\{AppName}\\Uninstall {AppName}.lnk",
+            "description": "Uninstall {AppName}",
+            "workingDirectory": "{InstallPath}"
+          }
+        }
+      ]
+    },
+    {
+      "id": "file-associations",
+      "name": "File Associations",
+      "description": "Associate common Arcas configuration file types (.arcas) with the application so you can double-click files to open them automatically.",
+      "required": false,
+      "defaultSelected": false,
+      "sizeBytes": 0,
+      "conditions": [
+        {
+          "type": "architecture",
+          "target": "",
+          "expectedValue": "x64",
+          "negate": false
+        }
+      ],
+      "commands": [
+        {
+          "id": "create-file-association",
+          "name": "Create .arcas File Association",
+          "type": "CreateFileAssociation",
+          "runAsAdmin": true,
+          "parameters": {
+            "extension": ".arcas",
+            "progId": "Arcas.ConfigFile",
+            "description": "Arcas Configuration File",
+            "executable": "{InstallPath}\\{AppName}.exe"
+          }
+        }
+      ]
+    },
+    {
+      "id": "registry-entries",
+      "name": "Registry Integration",
+      "description": "Register the application with Windows for proper integration and uninstall support.",
+      "required": false,
+      "defaultSelected": true,
+      "sizeBytes": 0,
+      "commands": [
+        {
+          "id": "register-app",
+          "name": "Register Application",
+          "type": "WriteRegistry",
+          "runAsAdmin": true,
+          "parameters": {
+            "keyPath": "SOFTWARE\\{AppPublisher}\\{AppName}",
+            "valueName": "InstallPath",
+            "value": "{InstallPath}",
+            "valueType": "String"
+          }
+        },
+        {
+          "id": "register-version",
+          "name": "Register Version",
+          "type": "WriteRegistry",
+          "runAsAdmin": true,
+          "parameters": {
+            "keyPath": "SOFTWARE\\{AppPublisher}\\{AppName}",
+            "valueName": "Version",
+            "value": "{AppVersion}",
+            "valueType": "String"
+          }
+        },
+        {
+          "id": "register-uninstall",
+          "name": "Register Uninstaller",
+          "type": "WriteRegistry",
+          "runAsAdmin": true,
+          "parameters": {
+            "keyPath": "SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{AppName}",
+            "valueName": "DisplayName",
+            "value": "{AppName}",
+            "valueType": "String"
+          }
+        }
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "id": "welcome",
+      "title": "Welcome",
+      "subtitle": "Welcome to the setup wizard",
+      "enabled": true,
+      "order": 1,
+      "pageType": "Welcome"
+    },
+    {
+      "id": "license",
+      "title": "License Agreement",
+      "subtitle": "Please review the license terms",
+      "enabled": true,
+      "order": 2,
+      "pageType": "License"
+    },
+    {
+      "id": "directory",
+      "title": "Installation Directory",
+      "subtitle": "Choose where to install the application",
+      "enabled": true,
+      "order": 3,
+      "pageType": "Directory"
+    },
+    {
+      "id": "components",
+      "title": "Select Components",
+      "subtitle": "Choose which features to install",
+      "enabled": true,
+      "order": 4,
+      "pageType": "Components"
+    },
+    {
+      "id": "progress",
+      "title": "Installing",
+      "subtitle": "Please wait while the application is being installed",
+      "enabled": true,
+      "order": 5,
+      "pageType": "Progress"
+    },
+    {
+      "id": "completion",
+      "title": "Setup Complete",
+      "subtitle": "Installation has been completed successfully",
+      "enabled": true,
+      "order": 6,
+      "pageType": "Completion"
+    }
+  ],
+  "globalCommands": [
+    {
+      "id": "create-install-dir",
+      "name": "Create Installation Directory",
+      "type": "CreateDirectory",
+      "timing": "PreInstall",
+      "order": 1,
+      "parameters": {
+        "path": "{InstallPath}"
+      }
+    },
+    {
+      "id": "set-install-complete",
+      "name": "Mark Installation Complete",
+      "type": "WriteRegistry",
+      "timing": "PostInstall",
+      "order": 999,
+      "runAsAdmin": true,
+      "parameters": {
+        "keyPath": "SOFTWARE\\{AppPublisher}\\{AppName}",
+        "valueName": "InstallComplete",
+        "value": "true",
+        "valueType": "String"
+      }
+    }
+  ],
+  "variables": {
+    "CompanyName": "SAPTeam",
+    "ProductLine": "Development Tools",
+    "SupportEmail": "support@sapteam.org"
+  }
+}
